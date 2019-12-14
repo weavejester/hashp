@@ -26,6 +26,11 @@
 
 (def prefix (color/sgr "#p" :red))
 
+(def print-opts
+  (merge puget/*options*
+         {:print-color    true
+          :namespace-maps true}))
+
 (defn p* [form]
   (let [orig-form (walk/postwalk hide-p-form form)]
     `(let [~result-sym ~form]
@@ -34,6 +39,6 @@
           (str prefix
                (color/sgr (trace-str (current-stacktrace)) :green) " "
                (when-not (= ~result-sym '~orig-form)
-                 (str (puget/cprint-str '~orig-form) " => "))
-               (puget/cprint-str ~result-sym)))
+                 (str (puget/pprint-str '~orig-form print-opts) " => "))
+               (puget/pprint-str ~result-sym print-opts)))
          ~result-sym))))
