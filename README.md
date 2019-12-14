@@ -52,7 +52,6 @@ Add the following to `~/.boot/profile.boot`:
 (boot.core/load-data-readers!)
 ```
 
-
 ## License
 
 Copyright © 2019 James Reeves
