@@ -7,5 +7,8 @@
 (defn p* [form]
   `(let [result# ~form]
      (locking lock
-       (println (puget/cprint-str '~form) "=>" (puget/cprint-str result#))
+       (println
+        (str (when-not (= result# '~form)
+               (str (puget/cprint-str '~form) " => "))
+             (puget/cprint-str result#)))
        result#)))
