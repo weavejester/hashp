@@ -1,0 +1,1 @@
+{p hasp.core/p*}

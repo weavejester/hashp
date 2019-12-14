@@ -1,6 +1,11 @@
-(ns hasp.core)
+(ns hasp.core
+  (:require [puget.printer :as puget]
+            [clj-stacktrace.core :as stacktrace]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(def lock (Object.))
+
+(defn p* [form]
+  `(let [result# ~form]
+     (locking lock
+       (println (puget/cprint-str '~form) "=>" (puget/cprint-str result#))
+       result#)))
