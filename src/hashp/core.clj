@@ -1,11 +1,8 @@
 (ns hashp.core
-  (:require [puget.printer :as puget]
-            [puget.color.ansi :as color]
-            [clj-stacktrace.core :as stacktrace]))
-
-(def lock (Object.))
-
-(def prefix (color/sgr "#p" :red))
+  (:require [clj-stacktrace.core :as stacktrace]
+            [clojure.walk :as walk]
+            [puget.printer :as puget]
+            [puget.color.ansi :as color]))
 
 (defn current-stacktrace []
   (->> (.getStackTrace (Thread/currentThread))
@@ -16,13 +13,27 @@
   (when-let [t (first (filter :clojure trace))]
     (str "[" (:ns t) "/" (:fn t) ":" (:line t) "]")))
 
+(def result-sym (gensym "result"))
+
+(defn- hide-p-form [form]
+  (if (and (seq? form)
+           (vector? (second form))
+           (= (-> form second first) result-sym))
+    (-> form second second)
+    form))
+
+(def lock (Object.))
+
+(def prefix (color/sgr "#p" :red))
+
 (defn p* [form]
-  `(let [result# ~form]
-     (locking lock
-       (println
-        (str prefix
-             (color/sgr (trace-str (current-stacktrace)) :green) " "
-             (when-not (= result# '~form)
-               (str (puget/cprint-str '~form) " => "))
-             (puget/cprint-str result#)))
-       result#)))
+  (let [orig-form (walk/postwalk hide-p-form form)]
+    `(let [~result-sym ~form]
+       (locking lock
+         (println
+          (str prefix
+               (color/sgr (trace-str (current-stacktrace)) :green) " "
+               (when-not (= ~result-sym '~orig-form)
+                 (str (puget/cprint-str '~orig-form) " => "))
+               (puget/cprint-str ~result-sym)))
+         ~result-sym))))
