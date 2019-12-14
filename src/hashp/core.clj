@@ -1,4 +1,4 @@
-(ns hasp.core
+(ns hashp.core
   (:require [puget.printer :as puget]
             [clj-stacktrace.core :as stacktrace]))
 

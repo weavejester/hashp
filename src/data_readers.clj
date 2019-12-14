@@ -1,1 +1,1 @@
-{p hasp.core/p*}
+{p hashp.core/p*}

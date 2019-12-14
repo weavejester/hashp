@@ -1,6 +1,6 @@
-(ns hasp.core-test
+(ns hashp.core-test
   (:require [clojure.test :refer :all]
-            [hasp.core :refer :all]))
+            [hashp.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
