@@ -37,7 +37,7 @@ Add the following to `~/.lein/profiles.clj`:
 
 ```edn
 {:user
- {:dependencies [[hashp "0.1.0"]]
+ {:dependencies [[hashp "0.1.1"]]
   :injections [(require 'hashp.core)]}}
 ```
 
@@ -46,7 +46,7 @@ Add the following to `~/.lein/profiles.clj`:
 Add the following to `~/.boot/profile.boot`:
 
 ```clojure
-(set-env! :dependencies #(conj % '[hashp "0.1.0"]))
+(set-env! :dependencies #(conj % '[hashp "0.1.1"]))
 
 (require 'hashp.core)
 (boot.core/load-data-readers!)
