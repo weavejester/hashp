@@ -52,6 +52,21 @@ Add the following to `~/.boot/profile.boot`:
 (boot.core/load-data-readers!)
 ```
 
+### Shadow-CLJS
+
+Add the following to `shadow-cljs.edn`:
+```clojure
+{:dependencies [hashp "0.1.2"]
+ :nrepl {:init-ns user}
+ :builds {:app {:devtools {:preloads [hashp.core]}}}}
+```
+
+Create a file `src/user.clj`:
+```clojure
+(ns user
+  (:require [hashp.core]))
+```
+
 ## License
 
 Copyright © 2019 James Reeves
