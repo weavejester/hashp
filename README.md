@@ -69,6 +69,6 @@ Create a file `src/user.clj`:
 
 ## License
 
-Copyright © 2019 James Reeves
+Copyright © 2020 James Reeves
 
 Released under the MIT license.
