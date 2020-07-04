@@ -31,7 +31,9 @@
 (def print-opts
   (merge puget/*options*
          {:print-color    true
-          :namespace-maps true}))
+          :namespace-maps true
+          :color-scheme
+          {:nil [:bold :blue]}}))
 
 (defn p* [form]
   (let [orig-form (walk/postwalk hide-p-form form)]
