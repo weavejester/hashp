@@ -1,5 +1,6 @@
 (ns hashp.core
-  (:require [zprint.core :as zprint]))
+  (:require [zprint.core :as zprint])
+  (:require-macros hashp.core))
 
 (def prefix "#p")
 
