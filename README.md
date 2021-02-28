@@ -57,14 +57,19 @@ Add the following to `~/.boot/profile.boot`:
 Add the following to `shadow-cljs.edn`:
 ```clojure
 {:dependencies [hashp "0.2.0"]
- :nrepl {:init-ns user}
  :builds {:app {:devtools {:preloads [hashp.core]}}}}
 ```
 
-Create a file `src/user.clj`:
+Or alternatively via `~/.shadow-cljs/config.edn` and `--config-merge`:
+
+`~/.shadow-cljs/config.edn`:
 ```clojure
-(ns user
-  (:require [hashp.core]))
+{:dependencies [[hashp "0.2.0"]]}
+```
+
+Run:
+```
+shadow-cljs watch app --config-merge '{:devtools {:preloads [hashp.core]}}'
 ```
 
 ## License
