@@ -54,3 +54,24 @@
                          (str (zprint/zprint-str '~orig-form print-opts) " => "))
                        (zprint/zprint-str ~result-sym print-opts)))
                  ~result-sym)))))
+
+(def t-prefix "#t")
+
+(defn t* [form]
+  (let [orig-form (walk/postwalk hide-p-form form)]
+    `(let [~result-sym ~form]
+       (macrovich/case
+        :clj (locking lock
+               (tap> [(str t-prefix (trace-str (current-stacktrace)))
+                      (when-not (= ~result-sym '~orig-form)
+                        '~orig-form)
+                      :=>
+                      ~result-sym])
+               ~result-sym)
+        :cljs (do
+                (tap> [t-prefix
+                       (when-not (= ~result-sym '~orig-form)
+                         '~orig-form)
+                       :=>
+                       ~result-sym])
+                ~result-sym)))))
