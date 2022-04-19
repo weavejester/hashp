@@ -56,7 +56,7 @@ Add the following to `~/.boot/profile.boot`:
 
 Add the following to `shadow-cljs.edn`:
 ```clojure
-{:dependencies [hashp "0.2.1"]
+{:dependencies [[hashp "0.2.1"]]
  :builds {:app {:devtools {:preloads [hashp.core]}}}}
 ```
 
