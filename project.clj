@@ -8,4 +8,4 @@
                  [mvxcvi/puget "1.3.1"]
                  [clj-stacktrace "0.2.8"]
                  [net.cgrand/macrovich "0.2.1"]
-                 [zprint "1.1.1"]])
+                 [zprint "1.2.4"]])
