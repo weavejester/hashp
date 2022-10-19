@@ -1,1 +1,2 @@
-{p hashp.core/p*}
+{p hashp.core/p*
+ t hashp.core/t*}
