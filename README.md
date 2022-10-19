@@ -74,6 +74,6 @@ shadow-cljs watch app --config-merge '{:devtools {:preloads [hashp.core]}}'
 
 ## License
 
-Copyright © 2021 James Reeves
+Copyright © 2022 James Reeves
 
 Released under the MIT license.
