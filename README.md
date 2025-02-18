@@ -52,26 +52,6 @@ Add the following to `~/.boot/profile.boot`:
 (boot.core/load-data-readers!)
 ```
 
-### Shadow-CLJS
-
-Add the following to `shadow-cljs.edn`:
-```clojure
-{:dependencies [hashp "0.2.2"]
- :builds {:app {:devtools {:preloads [hashp.core]}}}}
-```
-
-Or alternatively via `~/.shadow-cljs/config.edn` and `--config-merge`:
-
-`~/.shadow-cljs/config.edn`:
-```clojure
-{:dependencies [[hashp "0.2.2"]]}
-```
-
-Run:
-```
-shadow-cljs watch app --config-merge '{:devtools {:preloads [hashp.core]}}'
-```
-
 ## License
 
 Copyright © 2022 James Reeves

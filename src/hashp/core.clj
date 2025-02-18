@@ -1,10 +1,8 @@
 (ns hashp.core
   (:require [clj-stacktrace.core :as stacktrace]
             [clojure.walk :as walk]
-            [net.cgrand.macrovich :as macrovich]
             [puget.printer :as puget]
-            [puget.color.ansi :as color]
-            [zprint.core :as zprint]))
+            [puget.color.ansi :as color]))
 
 (defn current-stacktrace []
   (->> (.getStackTrace (Thread/currentThread))
@@ -26,8 +24,6 @@
 
 (def lock (Object.))
 
-(def prefix (color/sgr "#p" :red))
-
 (def print-opts
   (merge puget/*options*
          {:print-color    true
@@ -38,19 +34,11 @@
 (defn p* [form]
   (let [orig-form (walk/postwalk hide-p-form form)]
     `(let [~result-sym ~form]
-       (macrovich/case
-         :clj (locking lock
-                (println
-                 (str prefix
-                      (color/sgr (trace-str (current-stacktrace)) :green) " "
-                      (when-not (= ~result-sym '~orig-form)
-                        (str (puget/pprint-str '~orig-form print-opts) " => "))
-                      (puget/pprint-str ~result-sym print-opts)))
-                ~result-sym)
-         :cljs (do
-                 (println
-                  (str prefix " "
-                       (when-not (= ~result-sym '~orig-form)
-                         (str (zprint/zprint-str '~orig-form print-opts) " => "))
-                       (zprint/zprint-str ~result-sym print-opts)))
-                 ~result-sym)))))
+       (locking lock
+         (println
+          (str (color/sgr "#p" :red)
+               (color/sgr (trace-str (current-stacktrace)) :green) " "
+               (when-not (= ~result-sym '~orig-form)
+                 (str (puget/pprint-str '~orig-form print-opts) " => "))
+               (puget/pprint-str ~result-sym print-opts)))
+         ~result-sym))))
