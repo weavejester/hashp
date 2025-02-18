@@ -1,4 +1,4 @@
-(ns hashp.core
+(ns hashp.preload
   (:require [clj-stacktrace.core :as stacktrace]
             [clojure.walk :as walk]
             [puget.printer :as puget]

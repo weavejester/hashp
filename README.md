@@ -43,7 +43,7 @@ your project's `deps.edn` file:
 You will then need to load the `hashp.core` namespace before using `#p`:
 
 ```clojure
-(require 'hashp.core)
+(require 'hashp.preload)
 ```
 
 ### Leiningen
@@ -54,7 +54,7 @@ following to `~/.lein/profiles.clj`:
 ```edn
 {:user
  {:dependencies [[hashp "0.2.2"]]
-  :injections [(require 'hashp.core)]}}
+  :injections [(require 'hashp.preload)]}}
 ```
 
 ### Boot
@@ -64,7 +64,7 @@ to `~/.boot/profile.boot`:
 
 ```clojure
 (set-env! :dependencies #(conj % '[hashp "0.2.2"]))
-(require 'hashp.core)
+(require 'hashp.preload)
 (boot.core/load-data-readers!)
 ```
 
