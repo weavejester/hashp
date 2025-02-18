@@ -29,11 +29,27 @@ user=> (mean [1 4 5 2])
 3.0
 ```
 
-## Install
+## Installation
+
+### tools.deps
+
+To use `#p` in a tools.deps project, add the following dependency to
+your project's `deps.edn` file:
+
+```edn
+{:deps {hashp/hashp {:mvn/version "0.2.2"}}}
+```
+
+You will then need to load the `hashp.core` namespace before using `#p`:
+
+```clojure
+(require 'hashp.core)
+```
 
 ### Leiningen
 
-Add the following to `~/.lein/profiles.clj`:
+To make `#p` globally available to all Leiningen projects, add the
+following to `~/.lein/profiles.clj`:
 
 ```edn
 {:user
@@ -43,11 +59,11 @@ Add the following to `~/.lein/profiles.clj`:
 
 ### Boot
 
-Add the following to `~/.boot/profile.boot`:
+To make `#p` globally available to all Boot projects, add the following
+to `~/.boot/profile.boot`:
 
 ```clojure
 (set-env! :dependencies #(conj % '[hashp "0.2.2"]))
-
 (require 'hashp.core)
 (boot.core/load-data-readers!)
 ```
