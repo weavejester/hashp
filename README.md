@@ -54,6 +54,6 @@ Add the following to `~/.boot/profile.boot`:
 
 ## License
 
-Copyright © 2022 James Reeves
+Copyright © 2025 James Reeves
 
 Released under the MIT license.
