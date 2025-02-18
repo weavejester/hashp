@@ -68,6 +68,15 @@ to `~/.boot/profile.boot`:
 (boot.core/load-data-readers!)
 ```
 
+### Tools.deps
+
+Merge the following to `~/.deps.edn`:
+
+```edn
+{:extra-deps {hashp {:mvn/version "0.1.0"}}
+ :main-opts ["-e" "(require,'hashp.core)"]}
+```
+
 ## License
 
 Copyright © 2025 James Reeves
