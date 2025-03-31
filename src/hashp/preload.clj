@@ -50,7 +50,9 @@
             (puget/pprint-str value print-opts))))))
 
 (defn p* [form]
-  (let [orig-form (walk/postwalk hide-p-form form)]
-    `(let [~result-sym ~form]
-       (print-log (current-stacktrace) '~orig-form ~result-sym)
-       ~result-sym)))
+  (if config/*disable-hashp*
+    form
+    (let [orig-form (walk/postwalk hide-p-form form)]
+      `(let [~result-sym ~form]
+         (print-log (current-stacktrace) '~orig-form ~result-sym)
+         ~result-sym))))
