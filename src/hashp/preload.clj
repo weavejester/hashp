@@ -31,14 +31,17 @@
           :color-scheme
           {:nil [:bold :blue]}}))
 
+(defn print-log [trace form value]
+  (locking lock
+    (println
+     (str (color/sgr "#p" :red)
+          (color/sgr (trace-str trace) :green) " "
+          (when-not (= value form)
+            (str (puget/pprint-str form print-opts) " => "))
+          (puget/pprint-str value print-opts)))))
+
 (defn p* [form]
   (let [orig-form (walk/postwalk hide-p-form form)]
     `(let [~result-sym ~form]
-       (locking lock
-         (println
-          (str (color/sgr "#p" :red)
-               (color/sgr (trace-str (current-stacktrace)) :green) " "
-               (when-not (= ~result-sym '~orig-form)
-                 (str (puget/pprint-str '~orig-form print-opts) " => "))
-               (puget/pprint-str ~result-sym print-opts)))
-         ~result-sym))))
+       (print-log (current-stacktrace) '~orig-form ~result-sym)
+       ~result-sym)))
