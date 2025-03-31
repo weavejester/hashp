@@ -1,6 +1,7 @@
 (ns hashp.preload
   (:require [clj-stacktrace.core :as stacktrace]
             [clojure.walk :as walk]
+            [hashp.config :as config]
             [puget.printer :as puget]
             [puget.color.ansi :as color]))
 
@@ -31,14 +32,22 @@
           :color-scheme
           {:nil [:bold :blue]}}))
 
+(def no-color-print-opts
+  (assoc print-opts :print-color false))
+
 (defn print-log [trace form value]
   (locking lock
     (println
-     (str (color/sgr "#p" :red)
-          (color/sgr (trace-str trace) :green) " "
-          (when-not (= value form)
-            (str (puget/pprint-str form print-opts) " => "))
-          (puget/pprint-str value print-opts)))))
+     (if config/*disable-color*
+       (str "#p" (trace-str trace) " "
+            (when-not (= value form)
+              (str (puget/pprint-str form no-color-print-opts) " => "))
+            (puget/pprint-str value no-color-print-opts))
+       (str (color/sgr "#p" :red)
+            (color/sgr (trace-str trace) :green) " "
+            (when-not (= value form)
+              (str (puget/pprint-str form print-opts) " => "))
+            (puget/pprint-str value print-opts))))))
 
 (defn p* [form]
   (let [orig-form (walk/postwalk hide-p-form form)]
