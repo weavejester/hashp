@@ -37,17 +37,18 @@
 
 (defn print-log [trace form value]
   (locking lock
-    (println
-     (if config/*disable-color*
-       (str "#p" (trace-str trace) " "
-            (when-not (= value form)
-              (str (puget/pprint-str form no-color-print-opts) " => "))
-            (puget/pprint-str value no-color-print-opts))
-       (str (color/sgr "#p" :red)
-            (color/sgr (trace-str trace) :green) " "
-            (when-not (= value form)
-              (str (puget/pprint-str form print-opts) " => "))
-            (puget/pprint-str value print-opts))))))
+    (binding [*out* config/*hashp-output*]
+      (println
+       (if config/*disable-color*
+         (str "#p" (trace-str trace) " "
+              (when-not (= value form)
+                (str (puget/pprint-str form no-color-print-opts) " => "))
+              (puget/pprint-str value no-color-print-opts))
+         (str (color/sgr "#p" :red)
+              (color/sgr (trace-str trace) :green) " "
+              (when-not (= value form)
+                (str (puget/pprint-str form print-opts) " => "))
+              (puget/pprint-str value print-opts)))))))
 
 (defn p* [form]
   (if config/*disable-hashp*

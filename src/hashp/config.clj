@@ -5,3 +5,5 @@
 
 (def ^:dynamic *disable-color*
   (not (str/blank? (System/getenv "NO_COLOR"))))
+
+(def ^:dynamic *hashp-output* *err*)

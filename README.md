@@ -2,7 +2,7 @@
 
 Hashp is a better `prn` for debugging Clojure code. Inspired by
 projects like [Spyscope][], Hashp (ab)uses data readers to make it
-easier to get useful debugging data sent to STDOUT.
+easier to get useful debugging data sent to STDERR.
 
 [spyscope]: https://github.com/dgrnbrg/spyscope
 
@@ -92,6 +92,15 @@ checked on each print, so there's no need to reload the namespaces.
 ```
 user=> (alter-var-root #'hashp.config/*disable-color* (constantly true))
 true
+```
+
+Finally, you can change the output writer. By default this is `*err*`,
+which outputs to STDOUT, but you can set this to any other print writer,
+such as `*out*`.
+
+```
+user=> (alter-var-root #'hashp.config/*hashp-output* (constantly *out*))
+#object[java.io.PrintWriter 0x2deddab6 "java.io.PrintWriter@2deddab6"]
 ```
 
 [no_color]: https://no-color.org/
