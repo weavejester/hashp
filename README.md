@@ -68,6 +68,34 @@ to `~/.boot/profile.boot`:
 (boot.core/load-data-readers!)
 ```
 
+## Configuration
+
+Hashp can be turned on or off via the `hashp.config/*disable-hashp*`
+var. This is checked when `#p` is **initially evaluated**, so if it is
+changed, any existing namespace that uses `#p` will need to be reloaded
+before the change takes effect.
+
+```
+user=> (alter-var-root #'hashp.config/*disable-hashp* (constantly true))
+true
+user=> (require 'example.core :reload)
+nil
+user=> (mean [1 4 5 2])
+3.0
+```
+
+You can also turn the colors off. Hashp respects the [NO_COLOR][]
+environment variable, and you can also set it via the
+`hashp.config/*disable-color*` var. Unlike `*disable-hashp*`, this is
+checked on each print, so there's no need to reload the namespaces.
+
+```
+user=> (alter-var-root #'hashp.config/*disable-color* (constantly true))
+true
+```
+
+[no_color]: https://no-color.org/
+
 ## License
 
 Copyright © 2025 James Reeves
