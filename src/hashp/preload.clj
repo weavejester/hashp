@@ -18,9 +18,9 @@
 
 (defn- hide-p-form [form]
   (if (and (seq? form)
-           (vector? (second form))
-           (= (-> form second first) result-sym))
-    (-> form second second)
+           (seq? (first form))
+           (= ::undef (second form)))
+    (-> form first second second second second)
     form))
 
 (def lock (Object.))
@@ -50,10 +50,21 @@
                 (str (puget/pprint-str form print-opts) " => "))
               (puget/pprint-str value print-opts)))))))
 
+(defn- p-form [form orig-form]
+  `(let [~result-sym ~form]
+     (print-log (current-stacktrace) '~orig-form ~result-sym)
+     ~result-sym))
+
 (defn p* [form]
   (if config/*disable-hashp*
     form
-    (let [orig-form (walk/postwalk hide-p-form form)]
-      `(let [~result-sym ~form]
-         (print-log (current-stacktrace) '~orig-form ~result-sym)
-         ~result-sym))))
+    (let [x (gensym "x")
+          y (gensym "y")
+          orig-form (walk/postwalk hide-p-form form)]
+      `((fn
+          ([_#] ~(p-form form orig-form))
+          ([~x ~y]
+           (cond
+            (= ::undef ~x) ~(p-form `(->> ~y ~form) orig-form)
+            (= ::undef ~y) ~(p-form `(-> ~x ~form) orig-form))))
+         ::undef))))
