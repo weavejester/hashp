@@ -1,4 +1,4 @@
-(defproject dev.weavejester/hashp "0.4.0"
+(defproject dev.weavejester/hashp "0.4.1"
   :description "A better \"prn\" for debugging"
   :url "https://github.com/weavejester/hashp"
   :license {:name "The MIT License"
