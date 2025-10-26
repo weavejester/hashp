@@ -10,11 +10,9 @@
        (drop 3)
        (stacktrace/parse-trace-elems)))
 
-(defn trace-str [trace]
+(defn- trace-str [trace]
   (when-let [t (first (filter :clojure trace))]
     (str "[" (:ns t) "/" (:fn t) ":" (:line t) "]")))
-
-(def result-sym (gensym "result"))
 
 (defn- hide-p-form [form]
   (if (and (seq? form)
@@ -23,16 +21,16 @@
     (-> form first second second second second)
     form))
 
-(def lock (Object.))
+(def ^:private lock (Object.))
 
-(def print-opts
+(def ^:private print-opts
   (merge puget/*options*
          {:print-color    true
           :namespace-maps true
           :color-scheme
           {:nil [:bold :blue]}}))
 
-(def no-color-print-opts
+(def ^:private no-color-print-opts
   (assoc print-opts :print-color false))
 
 (defn print-log [trace form value]
@@ -51,9 +49,9 @@
               (puget/pprint-str value print-opts)))))))
 
 (defn- p-form [form orig-form]
-  `(let [~result-sym ~form]
-     (print-log (current-stacktrace) '~orig-form ~result-sym)
-     ~result-sym))
+  `(let [result# ~form]
+     (print-log (current-stacktrace) '~orig-form result#)
+     result#))
 
 (defn p* [form]
   (if config/*disable-hashp*
