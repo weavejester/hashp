@@ -1,4 +1,4 @@
-(ns hashp.preload
+(ns hashp.install
   (:require [clj-stacktrace.core :as stacktrace]
             [clojure.walk :as walk]
             [hashp.config :as config]
@@ -53,7 +53,7 @@
      (print-log (current-stacktrace) '~orig-form result#)
      result#))
 
-(defn p* [form]
+(defn hashp [form]
   (if config/*disable-hashp*
     form
     (let [x (gensym "x")
@@ -66,3 +66,13 @@
             (= ::undef ~x) ~(p-form `(->> ~y ~form) orig-form)
             (= ::undef ~y) ~(p-form `(-> ~x ~form) orig-form))))
          ::undef))))
+
+(defn install! []
+  (alter-var-root #'*data-readers* assoc 'p #'hashp)
+  (when (thread-bound? #'*data-readers*)
+    (set! *data-readers* (assoc *data-readers* 'p #'hashp))))
+
+(defn uninstall! []
+  (alter-var-root #'*data-readers* dissoc 'p)
+    (when (thread-bound? #'*data-readers*)
+      (set! *data-readers* (dissoc *data-readers* 'p))))
