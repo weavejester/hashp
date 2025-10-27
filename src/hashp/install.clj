@@ -1,18 +1,24 @@
 (ns hashp.install
   (:require [clj-stacktrace.core :as stacktrace]
+            [clojure.string :as str]
             [clojure.walk :as walk]
             [hashp.config :as config]
             [puget.printer :as puget]
             [puget.color.ansi :as color]))
 
+(def default-template
+  (str (color/sgr "#p" :red)
+       (color/sgr "[{ns}/{fn}:{line}]" :green)
+       " {form} => {value}"))
+
+(defn- from-template [templ param-map]
+  (str/replace templ #"\{([^}]+)\}"
+               (fn [[_ k]] (str (param-map (keyword k))))))
+
 (defn current-stacktrace []
   (->> (.getStackTrace (Thread/currentThread))
        (drop 3)
        (stacktrace/parse-trace-elems)))
-
-(defn- trace-str [trace]
-  (when-let [t (first (filter :clojure trace))]
-    (str "[" (:ns t) "/" (:fn t) ":" (:line t) "]")))
 
 (defn- hide-p-form [form]
   (if (and (seq? form)
@@ -23,7 +29,7 @@
 
 (def ^:private lock (Object.))
 
-(def ^:private print-opts
+(def ^:private color-print-opts
   (merge puget/*options*
          {:print-color    true
           :namespace-maps true
@@ -31,22 +37,21 @@
           {:nil [:bold :blue]}}))
 
 (def ^:private no-color-print-opts
-  (assoc print-opts :print-color false))
+  (assoc color-print-opts :print-color false))
 
 (defn print-log [trace form value]
-  (locking lock
-    (binding [*out* config/*hashp-output*]
-      (println
-       (if config/*disable-color*
-         (str "#p" (trace-str trace) " "
-              (when-not (= value form)
-                (str (puget/pprint-str form no-color-print-opts) " => "))
-              (puget/pprint-str value no-color-print-opts))
-         (str (color/sgr "#p" :red)
-              (color/sgr (trace-str trace) :green) " "
-              (when-not (= value form)
-                (str (puget/pprint-str form print-opts) " => "))
-              (puget/pprint-str value print-opts)))))))
+  (let [print-opts (if config/*disable-color*
+                     no-color-print-opts
+                     color-print-opts)
+        template   (if config/*disable-color*
+                     (color/strip default-template)
+                     default-template)
+        param-map  (merge {:form  (puget/pprint-str form print-opts)
+                           :value (puget/pprint-str value print-opts)}
+                          (first (filter :clojure trace)))]
+    (locking lock
+      (binding [*out* config/*hashp-output*]
+        (println (from-template template param-map))))))
 
 (defn- p-form [form orig-form]
   `(let [result# ~form]
