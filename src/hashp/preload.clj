@@ -50,10 +50,18 @@
                 (str (puget/pprint-str form print-opts) " => "))
               (puget/pprint-str value print-opts)))))))
 
+(def ^:dynamic *env* {})
+
+(defmacro local-eval [form]
+  `(binding [*ns*  (find-ns '~(ns-name *ns*))
+             *env* ~(reduce #(assoc %1 `'~%2 %2) {} (keys &env))]
+     (eval '(let [~@(mapcat #(list % `(get *env* '~%)) (keys &env))]
+              ~form))))
+
 (defn- p-form [form orig-form]
-  `(let [~result-sym ~form]
-     (print-log (current-stacktrace) '~orig-form ~result-sym)
-     ~result-sym))
+  `(let [result# (local-eval ~form)]
+     (print-log (current-stacktrace) '~orig-form result#)
+     result#))
 
 (defn p* [form]
   (if config/*disable-hashp*
