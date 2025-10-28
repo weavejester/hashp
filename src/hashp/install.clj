@@ -9,9 +9,9 @@
   {:color?    (str/blank? (System/getenv "NO_COLOR"))
    :tag       'p
    :disabled? false
-   :template  (str (color/sgr "#{tag}" :yellow) " {form} "
-                   (color/sgr "[{ns}/{fn}:{line}]\n⇒ " :white)
-                   "{value}")
+   :template  (str (color/sgr "#{tag}" :yellow)
+                   (color/sgr "[{ns}/{fn}:{line}] " :white)
+                   "{form} ⇒ {value}")
    :writer    *err*})
 
 (defonce ^:dynamic *options* default-options)
