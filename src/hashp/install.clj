@@ -8,9 +8,9 @@
 (def default-options
   {:color?    (str/blank? (System/getenv "NO_COLOR"))
    :disabled? false
-   :template (str (color/sgr "#p" :red)
-                  (color/sgr "[{ns}/{fn}:{line}]" :green)
-                  " {form} => {value}")
+   :template  (str (color/sgr "#{tag}" :yellow) " {form} "
+                   (color/sgr "[{ns}/{fn}:{line}]\n⇒ " :white)
+                   "{value}")
    :writer    *err*})
 
 (defonce ^:dynamic *options* default-options)
