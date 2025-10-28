@@ -13,7 +13,7 @@
                   " {form} => {value}")
    :writer    *err*})
 
-(def ^:dynamic *options* default-options)
+(defonce ^:dynamic *options* default-options)
 
 (defn- from-template [templ param-map]
   (str/replace templ #"\{([^}]+)\}"
