@@ -7,6 +7,7 @@
 
 (def default-options
   {:color?    (str/blank? (System/getenv "NO_COLOR"))
+   :tag       'p
    :disabled? false
    :template  (str (color/sgr "#{tag}" :yellow) " {form} "
                    (color/sgr "[{ns}/{fn}:{line}]\n⇒ " :white)
@@ -51,7 +52,8 @@
                      (:template *options*)
                      (color/strip (:template *options*)))
         param-map  (merge {:form  (puget/pprint-str form print-opts)
-                           :value (puget/pprint-str value print-opts)}
+                           :value (puget/pprint-str value print-opts)
+                           :tag   (:tag *options*)}
                           (first (filter :clojure trace)))]
     (locking lock
       (binding [*out* (:writer *options*)]
@@ -76,16 +78,19 @@
             (= ::undef ~y) ~(p-form `(-> ~x ~form) orig-form))))
          ::undef))))
 
+(defn uninstall! []
+  (let [tag (:tag *options*)]
+    (alter-var-root #'*data-readers* dissoc tag)
+    (when (thread-bound? #'*data-readers*)
+      (set! *data-readers* (dissoc *data-readers* tag)))))
+
 (defn install!
   ([] (install! {}))
   ([& {:as options}]
-   (let [options (merge default-options options)]
+   (uninstall!)
+   (let [options (merge default-options options)
+         tag     (:tag options)]
      (alter-var-root #'*options* (constantly options))
-     (alter-var-root #'*data-readers* assoc 'p #'hashp)
+     (alter-var-root #'*data-readers* assoc tag #'hashp)
      (when (thread-bound? #'*data-readers*)
-       (set! *data-readers* (assoc *data-readers* 'p #'hashp))))))
-
-(defn uninstall! []
-  (alter-var-root #'*data-readers* dissoc 'p)
-    (when (thread-bound? #'*data-readers*)
-      (set! *data-readers* (dissoc *data-readers* 'p))))
+       (set! *data-readers* (assoc *data-readers* tag #'hashp))))))
