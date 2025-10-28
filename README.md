@@ -37,7 +37,7 @@ To use `#p` in a tools.deps project, add the following dependency to
 your project's `deps.edn` file:
 
 ```edn
-{:deps {dev.weavejester/hashp {:mvn/version "0.4.1"}}}
+{:deps {dev.weavejester/hashp {:mvn/version "0.5.0"}}}
 ```
 
 You will then need to install hashp before any other file is loaded.
@@ -53,7 +53,7 @@ following to `~/.lein/profiles.clj`:
 
 ```edn
 {:user
- {:dependencies [[dev.weavejester/hashp "0.4.1"]]
+ {:dependencies [[dev.weavejester/hashp "0.5.0"]]
   :injections [((requiring-resolve 'hashp.install/install!))]}}
 ```
 
@@ -63,7 +63,7 @@ To make `#p` globally available to all Boot projects, add the following
 to `~/.boot/profile.boot`:
 
 ```clojure
-(set-env! :dependencies #(conj % '[dev.weavejester/hashp "0.4.1"]))
+(set-env! :dependencies #(conj % '[dev.weavejester/hashp "0.5.0"]))
 ((requiring-resolve 'hashp.install/install!))
 (boot.core/load-data-readers!)
 ```
