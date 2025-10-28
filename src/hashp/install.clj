@@ -2,14 +2,18 @@
   (:require [clj-stacktrace.core :as stacktrace]
             [clojure.string :as str]
             [clojure.walk :as walk]
-            [hashp.config :as config]
             [puget.printer :as puget]
             [puget.color.ansi :as color]))
 
-(def default-template
-  (str (color/sgr "#p" :red)
-       (color/sgr "[{ns}/{fn}:{line}]" :green)
-       " {form} => {value}"))
+(def default-options
+  {:color?    (str/blank? (System/getenv "NO_COLOR"))
+   :disabled? false
+   :template (str (color/sgr "#p" :red)
+                  (color/sgr "[{ns}/{fn}:{line}]" :green)
+                  " {form} => {value}")
+   :writer    *err*})
+
+(def ^:dynamic *options* default-options)
 
 (defn- from-template [templ param-map]
   (str/replace templ #"\{([^}]+)\}"
@@ -40,17 +44,17 @@
   (assoc color-print-opts :print-color false))
 
 (defn print-log [trace form value]
-  (let [print-opts (if config/*disable-color*
-                     no-color-print-opts
-                     color-print-opts)
-        template   (if config/*disable-color*
-                     (color/strip default-template)
-                     default-template)
+  (let [print-opts (if (:color? *options*)
+                     color-print-opts
+                     no-color-print-opts)
+        template   (if (:color? *options*)
+                     (:template *options*)
+                     (color/strip (:template *options*)))
         param-map  (merge {:form  (puget/pprint-str form print-opts)
                            :value (puget/pprint-str value print-opts)}
                           (first (filter :clojure trace)))]
     (locking lock
-      (binding [*out* config/*hashp-output*]
+      (binding [*out* (:writer *options*)]
         (println (from-template template param-map))))))
 
 (defn- p-form [form orig-form]
@@ -59,7 +63,7 @@
      result#))
 
 (defn hashp [form]
-  (if config/*disable-hashp*
+  (if (:disabled? *options*)
     form
     (let [x (gensym "x")
           y (gensym "y")
@@ -72,10 +76,14 @@
             (= ::undef ~y) ~(p-form `(-> ~x ~form) orig-form))))
          ::undef))))
 
-(defn install! []
-  (alter-var-root #'*data-readers* assoc 'p #'hashp)
-  (when (thread-bound? #'*data-readers*)
-    (set! *data-readers* (assoc *data-readers* 'p #'hashp))))
+(defn install!
+  ([] (install! {}))
+  ([& {:as options}]
+   (let [options (merge default-options options)]
+     (alter-var-root #'*options* (constantly options))
+     (alter-var-root #'*data-readers* assoc 'p #'hashp)
+     (when (thread-bound? #'*data-readers*)
+       (set! *data-readers* (assoc *data-readers* 'p #'hashp))))))
 
 (defn uninstall! []
   (alter-var-root #'*data-readers* dissoc 'p)
