@@ -24,8 +24,8 @@ and line number:
 
 ```
 user=> (mean [1 4 5 2])
-#p[example.core/mean:4] (reduce + xs) => 12
-#p[example.core/mean:4] (count xs) => 4
+#p[example.core/mean:4] (reduce + xs) ⇒ 12
+#p[example.core/mean:4] (count xs) ⇒ 4
 3.0
 ```
 
@@ -40,10 +40,10 @@ your project's `deps.edn` file:
 {:deps {dev.weavejester/hashp {:mvn/version "0.4.1"}}}
 ```
 
-You will then need to load the `hashp.core` namespace before using `#p`:
+You will then need to install hashp before any other file is loaded.
 
 ```clojure
-(require 'hashp.preload)
+((requiring-resolve 'hashp.install/install!))
 ```
 
 ### Leiningen
@@ -54,7 +54,7 @@ following to `~/.lein/profiles.clj`:
 ```edn
 {:user
  {:dependencies [[dev.weavejester/hashp "0.4.1"]]
-  :injections [(require 'hashp.preload)]}}
+  :injections [((requiring-resolve 'hashp.install/install!))]}}
 ```
 
 ### Boot
@@ -64,44 +64,36 @@ to `~/.boot/profile.boot`:
 
 ```clojure
 (set-env! :dependencies #(conj % '[dev.weavejester/hashp "0.4.1"]))
-(require 'hashp.preload)
+((requiring-resolve 'hashp.install/install!))
 (boot.core/load-data-readers!)
 ```
 
 ## Configuration
 
-Hashp can be turned on or off via the `hashp.config/*disable-hashp*`
-var. This is checked when `#p` is **initially evaluated**, so if it is
-changed, any existing namespace that uses `#p` will need to be reloaded
-before the change takes effect.
+The `hashp.install/install!` function may be given named options:
 
-```
-user=> (alter-var-root #'hashp.config/*disable-hashp* (constantly true))
-true
-user=> (require 'example.core :reload)
-nil
-user=> (mean [1 4 5 2])
-3.0
+```clojure
+(require 'hashp.install)
+(hashp.install/install :color? false)
 ```
 
-You can also turn the colors off. Hashp respects the [NO_COLOR][]
-environment variable, and you can also set it via the
-`hashp.config/*disable-color*` var. Unlike `*disable-hashp*`, this is
-checked on each print, so there's no need to reload the namespaces.
+There are several options supported:
 
-```
-user=> (alter-var-root #'hashp.config/*disable-color* (constantly true))
-true
-```
+- `:color?` - set to true if the output should be in color. Defaults to
+  true unless the [NO_COLOR][] environment variable was set.
 
-Finally, you can change the output writer. By default this is `*err*`,
-which outputs to STDOUT, but you can set this to any other print writer,
-such as `*out*`.
+- `:disabled?` - if true then `#p` will do exactly nothing. This is
+  useful if you want to disable `#p` in a production environment with
+  no loss of performance. Defaults to false.
 
-```
-user=> (alter-var-root #'hashp.config/*hashp-output* (constantly *out*))
-#object[java.io.PrintWriter 0x2deddab6 "java.io.PrintWriter@2deddab6"]
-```
+- `:tag` - a symbol used for the tag, defaults to `'p`.
+
+- `:template` - a string that can be used to customize the format of
+  `#p`. Defaults to: `"#{tag}[{ns}/{fn}:{line}] {form} ⇒ {value}`
+
+- `:writer` - a `Writer` to use for the output, defaults to `*err*`,
+  which writes to STDERR. If you want to write to STDOUT instead, set
+  this to `*out*`.
 
 [no_color]: https://no-color.org/
 
