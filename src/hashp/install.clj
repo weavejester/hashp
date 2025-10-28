@@ -59,8 +59,16 @@
       (binding [*out* (:writer *options*)]
         (println (from-template template param-map))))))
 
+(def ^:dynamic *env* {})
+
+(defmacro local-eval [form]
+  `(binding [*ns*  (find-ns '~(ns-name *ns*))
+             *env* ~(reduce #(assoc %1 `'~%2 %2) {} (keys &env))]
+     (eval '(let [~@(mapcat #(list % `(get *env* '~%)) (keys &env))]
+              ~form))))
+
 (defn- p-form [form orig-form]
-  `(let [result# ~form]
+  `(let [result# (local-eval ~form)]
      (print-log (current-stacktrace) '~orig-form result#)
      result#))
 
